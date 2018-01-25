@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
+import com.luck.picture.lib.config.PictureSelectionConfig;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.permissions.RxPermissions;
 import com.luck.picture.lib.tools.PictureFileUtils;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private CheckBox cb_voice, cb_choose_mode, cb_isCamera, cb_isGif,
             cb_preview_img, cb_preview_video, cb_crop, cb_compress,
             cb_mode, cb_hide, cb_crop_circular, cb_styleCrop, cb_showCropGrid,
-            cb_showCropFrame, cb_preview_audio;
+            cb_showCropFrame, cb_preview_audio,cb_original_image;
     private int themeId;
     private int chooseMode = PictureMimeType.ofAll();
 
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cb_crop = (CheckBox) findViewById(R.id.cb_crop);
         cb_styleCrop = (CheckBox) findViewById(R.id.cb_styleCrop);
         cb_compress = (CheckBox) findViewById(R.id.cb_compress);
+        cb_original_image = (CheckBox) findViewById(R.id.cb_original_image);
         cb_mode = (CheckBox) findViewById(R.id.cb_mode);
         cb_showCropGrid = (CheckBox) findViewById(R.id.cb_showCropGrid);
         cb_showCropFrame = (CheckBox) findViewById(R.id.cb_showCropFrame);
@@ -114,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             // 预览音频
                             PictureSelector.create(MainActivity.this).externalPictureAudio(media.getPath());
                             break;
+                        default:
                     }
                 }
             }
@@ -147,6 +150,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cb_compress.setChecked(PictureSelectionConfig.getInstance().isCompress);
+    }
+
     private GridImageAdapter.onAddPicClickListener onAddPicClickListener = new GridImageAdapter.onAddPicClickListener() {
         @Override
         public void onAddPicClick() {
@@ -170,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         //.setOutputCameraPath("/CustomPath")// 自定义拍照保存路径
                         .enableCrop(cb_crop.isChecked())// 是否裁剪
                         .compress(cb_compress.isChecked())// 是否压缩
+                        .isShowOriginal(cb_original_image.isChecked()) //是否展示原图按钮
                         .synOrAsy(true)//同步true或异步false 压缩 默认同步
                         //.compressSavePath(getPath())//压缩图片保存地址
                         //.sizeMultiplier(0.5f)// glide 加载图片大小 0~1之间 如设置 .glideOverride()无效
@@ -210,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .isCamera(cb_isCamera.isChecked())// 是否显示拍照按钮
                         .enableCrop(cb_crop.isChecked())// 是否裁剪
                         .compress(cb_compress.isChecked())// 是否压缩
+                        .isShowOriginal(cb_original_image.isChecked()) //是否展示原图按钮
                         .glideOverride(160, 160)// glide 加载宽高，越小图片列表越流畅，但会影响列表图片浏览的清晰度
                         .withAspectRatio(aspect_ratio_x, aspect_ratio_y)// 裁剪比例 如16:9 3:2 3:4 1:1 可自定义
                         .hideBottomControls(cb_hide.isChecked() ? false : true)// 是否显示uCrop工具栏，默认不显示
@@ -254,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     adapter.setList(selectList);
                     adapter.notifyDataSetChanged();
                     break;
+                default:
             }
         }
     }
@@ -276,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tv_select_num.setText(maxSelectNum + "");
                 adapter.setSelectMax(maxSelectNum);
                 break;
+            default:
         }
     }
 
@@ -292,6 +305,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 cb_preview_video.setVisibility(View.VISIBLE);
                 cb_preview_img.setVisibility(View.VISIBLE);
                 cb_compress.setVisibility(View.VISIBLE);
+                cb_original_image.setVisibility(View.VISIBLE);
                 cb_crop.setVisibility(View.VISIBLE);
                 cb_isGif.setVisibility(View.VISIBLE);
                 cb_preview_audio.setVisibility(View.GONE);
@@ -307,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 cb_preview_audio.setVisibility(View.GONE);
                 cb_preview_img.setVisibility(View.VISIBLE);
                 cb_compress.setVisibility(View.VISIBLE);
+                cb_original_image.setVisibility(View.VISIBLE);
                 cb_crop.setVisibility(View.VISIBLE);
                 cb_isGif.setVisibility(View.VISIBLE);
                 break;
@@ -360,6 +375,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.rb_sina_style:
                 themeId = R.style.picture_Sina_style;
                 break;
+            default:
         }
     }
 
@@ -395,6 +411,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     cb_showCropGrid.setChecked(true);
                 }
                 break;
+            default:
         }
     }
 

@@ -71,9 +71,9 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
     private ImageView picture_left_back;
     private TextView picture_title, picture_right, picture_tv_ok, tv_empty,
             picture_tv_img_num, picture_id_preview, tv_PlayPause, tv_Stop, tv_Quit,
-            tv_musicStatus, tv_musicTotal, tv_musicTime;
+            tv_musicStatus, tv_musicTotal, tv_musicTime,tv_check;
     private RelativeLayout rl_picture_title, rl_bottom;
-    private LinearLayout id_ll_ok;
+    private LinearLayout id_ll_ok,ll_check;
     private RecyclerView picture_recycler;
     private PictureImageGridAdapter adapter;
     private List<LocalMedia> images = new ArrayList<>();
@@ -81,6 +81,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
     private FolderPopWindow folderWindow;
     private Animation animation = null;
     private boolean anim = false;
+    private boolean showOriginal_only;
     private RxPermissions rxPermissions;
     private PhotoPopupWindow popupWindow;
     private LocalMediaLoader mediaLoader;
@@ -103,6 +104,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                 case STATUSBAR:
                     LightStatusBarUtils.setLightStatusBar(PictureSelectorActivity.this, statusFont);
                     break;
+                default:
             }
         }
     };
@@ -131,6 +133,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                     }
                 }
                 break;
+            default:
         }
     }
 
@@ -191,19 +194,29 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
         picture_title = (TextView) findViewById(R.id.picture_title);
         picture_right = (TextView) findViewById(R.id.picture_right);
         picture_tv_ok = (TextView) findViewById(R.id.picture_tv_ok);
+        ll_check = (LinearLayout) findViewById(R.id.ll_check);
+        tv_check = (TextView) findViewById(R.id.tv_check);
         picture_id_preview = (TextView) findViewById(R.id.picture_id_preview);
         picture_tv_img_num = (TextView) findViewById(R.id.picture_tv_img_num);
         picture_recycler = (RecyclerView) findViewById(R.id.picture_recycler);
         rl_bottom = (RelativeLayout) findViewById(R.id.rl_bottom);
         id_ll_ok = (LinearLayout) findViewById(R.id.id_ll_ok);
         tv_empty = (TextView) findViewById(R.id.tv_empty);
-        rl_bottom.setVisibility(config.selectionMode == PictureConfig.SINGLE ? View.GONE : View.VISIBLE);
+        showOriginal_only = config.isShowOriginal && config.selectionMode == PictureConfig.SINGLE;
+        rl_bottom.setVisibility(showOriginal_only || config.selectionMode == PictureConfig.MULTIPLE ? View.VISIBLE : View.GONE);
         isNumComplete(numComplete);
         if (config.mimeType == PictureMimeType.ofAll()) {
             popupWindow = new PhotoPopupWindow(this);
             popupWindow.setOnItemClickListener(this);
         }
         picture_id_preview.setOnClickListener(this);
+        if (config.isShowOriginal) {
+            ll_check.setVisibility(View.VISIBLE);
+            ll_check.setOnClickListener(this);
+            ll_check.setSelected(!config.isCompress);
+        }else {
+            ll_check.setVisibility(View.GONE);
+        }
         if (config.mimeType == PictureMimeType.ofAudio()) {
             picture_id_preview.setVisibility(View.GONE);
             audioH = ScreenUtils.getScreenHeight(mContext)
@@ -211,6 +224,11 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
         } else {
             picture_id_preview.setVisibility(config.mimeType == PictureConfig.TYPE_VIDEO
                     ? View.GONE : View.VISIBLE);
+        }
+        if (showOriginal_only) {
+            rl_bottom.setBackgroundResource(R.color.color_4d);
+            picture_id_preview.setVisibility(View.GONE);
+            id_ll_ok.setVisibility(View.GONE);
         }
         picture_left_back.setOnClickListener(this);
         picture_right.setOnClickListener(this);
@@ -358,6 +376,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                     // 录音
                     startOpenCameraAudio();
                     break;
+                default:
             }
         }
     }
@@ -519,6 +538,30 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                 onResult(images);
             }
         }
+        if (id == R.id.ll_check) {
+            boolean isChecked = tv_check.isSelected();
+            selectImage(!isChecked, true);
+        }
+    }
+
+    /**
+     *
+     * @param isChecked
+     * @param isAnim
+     */
+    public void selectImage(boolean isChecked, boolean isAnim) {
+        tv_check.setSelected(isChecked);
+        if (isChecked) {
+            if (isAnim) {
+                if (animation != null) {
+                    tv_check.startAnimation(animation);
+                }
+            }
+
+        } else {
+
+        }
+        config.isCompress = !tv_check.isSelected();
     }
 
     /**
@@ -838,6 +881,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                     audioDialog(media.getPath());
                 }
                 break;
+            default:
         }
     }
 
@@ -857,6 +901,9 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
             boolean isVideo = PictureMimeType.isVideo(pictureType);
             boolean eqVideo = config.mimeType == PictureConfig.TYPE_VIDEO;
             picture_id_preview.setVisibility(isVideo || eqVideo ? View.GONE : View.VISIBLE);
+        }
+        if (showOriginal_only) {
+            picture_id_preview.setVisibility(View.GONE);
         }
         boolean enable = selectImages.size() != 0;
         if (enable) {
@@ -1009,6 +1056,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                         }
                     }
                     break;
+                default:
             }
         } else if (resultCode == RESULT_CANCELED) {
             if (config.camera) {
@@ -1084,6 +1132,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                 // 录视频
                 startOpenCameraVideo();
                 break;
+            default:
         }
     }
 }

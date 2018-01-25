@@ -64,6 +64,7 @@ public final class PictureSelectionConfig implements Parcelable {
     public boolean scaleEnabled;
     public boolean previewEggs;
     public boolean synOrAsy;
+    public boolean isShowOriginal;
 
     public List<LocalMedia> selectionMedias;
 
@@ -84,6 +85,7 @@ public final class PictureSelectionConfig implements Parcelable {
         overrideWidth = 0;
         overrideHeight = 0;
         isCompress = false;
+        isShowOriginal = false;
         aspect_ratio_x = 0;
         aspect_ratio_y = 0;
         cropWidth = 0;
@@ -160,6 +162,7 @@ public final class PictureSelectionConfig implements Parcelable {
         dest.writeInt(this.cropHeight);
         dest.writeByte(this.zoomAnim ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isCompress ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.isShowOriginal ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isCamera ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isGif ? (byte) 1 : (byte) 0);
         dest.writeByte(this.enablePreview ? (byte) 1 : (byte) 0);
@@ -209,6 +212,7 @@ public final class PictureSelectionConfig implements Parcelable {
         this.cropHeight = in.readInt();
         this.zoomAnim = in.readByte() != 0;
         this.isCompress = in.readByte() != 0;
+        this.isShowOriginal = in.readByte() != 0;
         this.isCamera = in.readByte() != 0;
         this.isGif = in.readByte() != 0;
         this.enablePreview = in.readByte() != 0;

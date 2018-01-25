@@ -19,12 +19,15 @@ import android.widget.TextView;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
+import com.luck.picture.lib.config.PictureSelectionConfig;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.tools.DebugUtil;
 import com.luck.pictureselector.adapter.GridImageAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * author：luck
@@ -49,7 +52,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
     private CheckBox cb_voice, cb_choose_mode, cb_isCamera, cb_isGif,
             cb_preview_img, cb_preview_video, cb_crop, cb_compress,
             cb_mode, cb_hide, cb_crop_circular, cb_styleCrop, cb_showCropGrid,
-            cb_showCropFrame, cb_preview_audio;
+            cb_showCropFrame, cb_preview_audio,cb_original_image;
     private int themeId;
     private int chooseMode = PictureMimeType.ofAll();
 
@@ -61,6 +64,12 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
         }
         init();
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        cb_compress.setChecked(PictureSelectionConfig.getInstance().isCompress);
     }
 
     private void init() {
@@ -80,6 +89,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
         cb_crop = (CheckBox) rootView.findViewById(R.id.cb_crop);
         cb_styleCrop = (CheckBox) rootView.findViewById(R.id.cb_styleCrop);
         cb_compress = (CheckBox) rootView.findViewById(R.id.cb_compress);
+        cb_original_image = (CheckBox) rootView.findViewById(R.id.cb_original_image);
         cb_mode = (CheckBox) rootView.findViewById(R.id.cb_mode);
         cb_showCropGrid = (CheckBox) rootView.findViewById(R.id.cb_showCropGrid);
         cb_showCropFrame = (CheckBox) rootView.findViewById(R.id.cb_showCropFrame);
@@ -97,6 +107,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
         cb_crop.setOnCheckedChangeListener(this);
         cb_crop_circular.setOnCheckedChangeListener(this);
         cb_compress.setOnCheckedChangeListener(this);
+        cb_original_image.setOnCheckedChangeListener(this);
         FullyGridLayoutManager manager = new FullyGridLayoutManager(getActivity(), 4, GridLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(manager);
         adapter = new GridImageAdapter(getActivity(), onAddPicClickListener);
@@ -122,6 +133,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
                         // 预览音频
                         PictureSelector.create(PhotoFragment.this).externalPictureAudio(media.getPath());
                         break;
+                    default:
                 }
             }
         });
@@ -145,6 +157,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
                         .isCamera(cb_isCamera.isChecked())
                         .enableCrop(cb_crop.isChecked())
                         .compress(cb_compress.isChecked())
+                        .isShowOriginal(cb_original_image.isChecked()) //是否展示原图按钮
                         .glideOverride(160, 160)
                         .previewEggs(true)
                         .withAspectRatio(aspect_ratio_x, aspect_ratio_y)
@@ -189,7 +202,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == getActivity().RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case PictureConfig.CHOOSE_REQUEST:
                     // 图片选择
@@ -198,6 +211,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
                     adapter.notifyDataSetChanged();
                     DebugUtil.i(TAG, "onActivityResult:" + selectList.size());
                     break;
+                default:
             }
         }
     }
@@ -220,6 +234,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
                 tv_select_num.setText(maxSelectNum + "");
                 adapter.setSelectMax(maxSelectNum);
                 break;
+            default:
         }
     }
 
@@ -234,6 +249,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
                 cb_isGif.setVisibility(View.GONE);
                 cb_preview_video.setChecked(true);
                 cb_preview_img.setChecked(true);
+                cb_original_image.setVisibility(View.VISIBLE);
                 cb_preview_video.setVisibility(View.VISIBLE);
                 cb_preview_img.setVisibility(View.VISIBLE);
                 cb_preview_audio.setVisibility(View.GONE);
@@ -248,6 +264,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
                 cb_preview_video.setVisibility(View.GONE);
                 cb_preview_img.setChecked(true);
                 cb_preview_img.setVisibility(View.VISIBLE);
+                cb_original_image.setVisibility(View.VISIBLE);
                 cb_preview_audio.setVisibility(View.GONE);
                 break;
             case R.id.rb_video:
@@ -298,6 +315,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
             case R.id.rb_sina_style:
                 themeId = R.style.picture_Sina_style;
                 break;
+            default:
         }
     }
 
@@ -334,6 +352,7 @@ public class PhotoFragment extends Fragment implements View.OnClickListener,
                     cb_showCropGrid.setChecked(true);
                 }
                 break;
+            default:
         }
     }
 }

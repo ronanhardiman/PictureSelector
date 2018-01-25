@@ -252,6 +252,15 @@
                 android:text="是否裁剪图片"
                 android:textColor="@color/color_53"
                 android:textSize="14sp" />
+            <CheckBox
+                android:id="@+id/cb_original_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="是否显示原图"
+                android:textColor="@color/color_53"
+                android:textSize="14sp"
+                android:visibility="visible" />
 
             <RadioGroup
                 android:id="@+id/rgb_crop"
