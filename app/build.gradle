@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.luck.pictureselector"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 23
         versionCode 5
         versionName "2.0.5"
